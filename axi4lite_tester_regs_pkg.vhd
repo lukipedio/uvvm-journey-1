@@ -1,8 +1,8 @@
 -- -----------------------------------------------------------------------------
 -- 'axi4lite_tester' Register Definitions
--- Revision: 0
+-- Revision: 4
 -- -----------------------------------------------------------------------------
--- Generated on 2021-10-04 at 10:51 (UTC) by airhdl version 2021.09.1
+-- Generated on 2021-11-01 at 11:20 (UTC) by airhdl version 2021.10.1-65
 -- -----------------------------------------------------------------------------
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 -- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -64,16 +64,42 @@ package axi4lite_tester_regs_pkg is
 
     -- User-logic ports (from register file to user-logic)
     type regs2user_t is record
-        dummy : std_logic; -- a dummy element to prevent empty records
+        test1_strobe : std_logic; -- Strobe signal for register 'test1' (pulsed when the register is written from the bus}
+        test1_value : std_logic_vector(31 downto 0); -- Value of register 'test1', field 'value'
+        test2_strobe : std_logic; -- Strobe signal for register 'test2' (pulsed when the register is written from the bus}
+        test2_value : std_logic_vector(31 downto 0); -- Value of register 'test2', field 'value'
+        test3_strobe : std_logic_vector(0 to 7); -- Strobe signal for register 'test3' (pulsed when the register is written from the bus}
+        test3_value : slv32_array_t(0 to 7); -- Value of register 'test3', field 'value'
     end record;
 
     -- Revision number of the 'axi4lite_tester' register map
-    constant axi4lite_TESTER_REVISION : natural := 0;
+    constant AXI4LITE_TESTER_REVISION : natural := 4;
 
     -- Default base address of the 'axi4lite_tester' register map
-    constant axi4lite_TESTER_DEFAULT_BASEADDR : unsigned(31 downto 0) := unsigned'(x"10000000");
-
+    constant AXI4LITE_TESTER_DEFAULT_BASEADDR : unsigned(31 downto 0) := unsigned'(x"10000000");
     -- Size of the 'axi4lite_tester' register map, in bytes
-    constant axi4lite_TESTER_RANGE_BYTES : natural := 0;
+    constant AXI4LITE_TESTER_RANGE_BYTES : natural := 40;
+
+    -- Register 'test1'
+    constant TEST1_OFFSET : unsigned(31 downto 0) := unsigned'(x"00000000"); -- address offset of the 'test1' register
+    -- Field 'test1.value'
+    constant TEST1_VALUE_BIT_OFFSET : natural := 0; -- bit offset of the 'value' field
+    constant TEST1_VALUE_BIT_WIDTH : natural := 32; -- bit width of the 'value' field
+    constant TEST1_VALUE_RESET : std_logic_vector(31 downto 0) := std_logic_vector'("00000000000000000000000000000000"); -- reset value of the 'value' field
+
+    -- Register 'test2'
+    constant TEST2_OFFSET : unsigned(31 downto 0) := unsigned'(x"00000004"); -- address offset of the 'test2' register
+    -- Field 'test2.value'
+    constant TEST2_VALUE_BIT_OFFSET : natural := 0; -- bit offset of the 'value' field
+    constant TEST2_VALUE_BIT_WIDTH : natural := 32; -- bit width of the 'value' field
+    constant TEST2_VALUE_RESET : std_logic_vector(31 downto 0) := std_logic_vector'("00000000000000000000000000000000"); -- reset value of the 'value' field
+
+    -- Register 'test3'
+    constant TEST3_OFFSET : unsigned(31 downto 0) := unsigned'(x"00000008"); -- address offset of the 'test3' register
+    constant TEST3_ARRAY_LENGTH : natural := 8; -- length of the 'test3' register array, in elements
+    -- Field 'test3.value'
+    constant TEST3_VALUE_BIT_OFFSET : natural := 0; -- bit offset of the 'value' field
+    constant TEST3_VALUE_BIT_WIDTH : natural := 32; -- bit width of the 'value' field
+    constant TEST3_VALUE_RESET : std_logic_vector(31 downto 0) := std_logic_vector'("00000000000000000000000000000000"); -- reset value of the 'value' field
 
 end axi4lite_tester_regs_pkg;

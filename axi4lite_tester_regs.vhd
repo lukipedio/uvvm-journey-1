@@ -1,8 +1,8 @@
 -- -----------------------------------------------------------------------------
 -- 'axi4lite_tester' Register Component
--- Revision: 0
+-- Revision: 4
 -- -----------------------------------------------------------------------------
--- Generated on 2021-10-04 at 10:51 (UTC) by airhdl version 2021.09.1
+-- Generated on 2021-11-01 at 11:20 (UTC) by airhdl version 2021.10.1-65
 -- -----------------------------------------------------------------------------
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 -- AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -83,6 +83,12 @@ architecture RTL of axi4lite_tester_regs is
     signal s_axi_rdata_r      : std_logic_vector(s_axi_rdata'range);
 
     -- User-defined registers
+    signal s_test1_strobe_r : std_logic;
+    signal s_reg_test1_value_r : std_logic_vector(31 downto 0);
+    signal s_test2_strobe_r : std_logic;
+    signal s_reg_test2_value_r : std_logic_vector(31 downto 0);
+    signal s_test3_strobe_r : std_logic_vector(0 to 7);
+    signal s_reg_test3_value_r : slv32_array_t(0 to 7);
 
 begin
 
@@ -137,6 +143,26 @@ begin
                     v_addr_hit := false;
                     v_rdata_r  := (others => '0');
 
+                    -- register 'test1' at address offset 0x0
+                    if s_axi_araddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST1_OFFSET(AXI_ADDR_WIDTH-1 downto 2), AXI_ADDR_WIDTH-2) then
+                        v_addr_hit := true;
+                        v_rdata_r(31 downto 0) := s_reg_test1_value_r;
+                        v_state_r := READ_RESPONSE;
+                    end if;
+                    -- register 'test2' at address offset 0x4
+                    if s_axi_araddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST2_OFFSET(AXI_ADDR_WIDTH-1 downto 2), AXI_ADDR_WIDTH-2) then
+                        v_addr_hit := true;
+                        v_rdata_r(31 downto 0) := s_reg_test2_value_r;
+                        v_state_r := READ_RESPONSE;
+                    end if;
+                    -- register 'test3[]' at address offset 0x8
+                    for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
+                        if s_axi_araddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST3_OFFSET(AXI_ADDR_WIDTH-1 downto 2) + i * 1, AXI_ADDR_WIDTH-2) then
+                            v_addr_hit := true;
+                            v_rdata_r(31 downto 0) := s_reg_test3_value_r(i);
+                            v_state_r := READ_RESPONSE;
+                        end if;
+                    end loop;
                     --
                     if v_addr_hit then
                         v_rresp_r := AXI_OKAY;
@@ -194,11 +220,20 @@ begin
             s_axi_bvalid_r     <= '0';
             s_axi_bresp_r      <= (others => '0');
             --
+            s_test1_strobe_r <= '0';
+            s_reg_test1_value_r <= TEST1_VALUE_RESET;
+            s_test2_strobe_r <= '0';
+            s_reg_test2_value_r <= TEST2_VALUE_RESET;
+            s_test3_strobe_r <= (others => '0');
+            s_reg_test3_value_r <= (others => TEST3_VALUE_RESET);
 
         elsif rising_edge(axi_aclk) then
             -- Default values:
             s_axi_awready_r <= '0';
             s_axi_wready_r  <= '0';
+            s_test1_strobe_r <= '0';
+            s_test2_strobe_r <= '0';
+            s_test3_strobe_r <= (others => '0');
 
             case v_state_r is
 
@@ -249,6 +284,314 @@ begin
                     s_axi_bvalid_r              <= '1';
                     --
                     v_addr_hit := false;
+                    -- register 'test1' at address offset 0x0
+                    if s_axi_awaddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST1_OFFSET(AXI_ADDR_WIDTH-1 downto 2), AXI_ADDR_WIDTH-2) then
+                        v_addr_hit := true;
+                        s_test1_strobe_r <= '1';
+                        -- field 'value':
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(0) <= s_axi_wdata_reg_r(0); -- value(0)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(1) <= s_axi_wdata_reg_r(1); -- value(1)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(2) <= s_axi_wdata_reg_r(2); -- value(2)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(3) <= s_axi_wdata_reg_r(3); -- value(3)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(4) <= s_axi_wdata_reg_r(4); -- value(4)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(5) <= s_axi_wdata_reg_r(5); -- value(5)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(6) <= s_axi_wdata_reg_r(6); -- value(6)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test1_value_r(7) <= s_axi_wdata_reg_r(7); -- value(7)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(8) <= s_axi_wdata_reg_r(8); -- value(8)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(9) <= s_axi_wdata_reg_r(9); -- value(9)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(10) <= s_axi_wdata_reg_r(10); -- value(10)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(11) <= s_axi_wdata_reg_r(11); -- value(11)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(12) <= s_axi_wdata_reg_r(12); -- value(12)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(13) <= s_axi_wdata_reg_r(13); -- value(13)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(14) <= s_axi_wdata_reg_r(14); -- value(14)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test1_value_r(15) <= s_axi_wdata_reg_r(15); -- value(15)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(16) <= s_axi_wdata_reg_r(16); -- value(16)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(17) <= s_axi_wdata_reg_r(17); -- value(17)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(18) <= s_axi_wdata_reg_r(18); -- value(18)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(19) <= s_axi_wdata_reg_r(19); -- value(19)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(20) <= s_axi_wdata_reg_r(20); -- value(20)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(21) <= s_axi_wdata_reg_r(21); -- value(21)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(22) <= s_axi_wdata_reg_r(22); -- value(22)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test1_value_r(23) <= s_axi_wdata_reg_r(23); -- value(23)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(24) <= s_axi_wdata_reg_r(24); -- value(24)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(25) <= s_axi_wdata_reg_r(25); -- value(25)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(26) <= s_axi_wdata_reg_r(26); -- value(26)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(27) <= s_axi_wdata_reg_r(27); -- value(27)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(28) <= s_axi_wdata_reg_r(28); -- value(28)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(29) <= s_axi_wdata_reg_r(29); -- value(29)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(30) <= s_axi_wdata_reg_r(30); -- value(30)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test1_value_r(31) <= s_axi_wdata_reg_r(31); -- value(31)
+                        end if;
+                    end if;
+                    -- register 'test2' at address offset 0x4
+                    if s_axi_awaddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST2_OFFSET(AXI_ADDR_WIDTH-1 downto 2), AXI_ADDR_WIDTH-2) then
+                        v_addr_hit := true;
+                        s_test2_strobe_r <= '1';
+                        -- field 'value':
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(0) <= s_axi_wdata_reg_r(0); -- value(0)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(1) <= s_axi_wdata_reg_r(1); -- value(1)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(2) <= s_axi_wdata_reg_r(2); -- value(2)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(3) <= s_axi_wdata_reg_r(3); -- value(3)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(4) <= s_axi_wdata_reg_r(4); -- value(4)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(5) <= s_axi_wdata_reg_r(5); -- value(5)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(6) <= s_axi_wdata_reg_r(6); -- value(6)
+                        end if;
+                        if s_axi_wstrb_reg_r(0) = '1' then
+                            s_reg_test2_value_r(7) <= s_axi_wdata_reg_r(7); -- value(7)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(8) <= s_axi_wdata_reg_r(8); -- value(8)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(9) <= s_axi_wdata_reg_r(9); -- value(9)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(10) <= s_axi_wdata_reg_r(10); -- value(10)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(11) <= s_axi_wdata_reg_r(11); -- value(11)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(12) <= s_axi_wdata_reg_r(12); -- value(12)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(13) <= s_axi_wdata_reg_r(13); -- value(13)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(14) <= s_axi_wdata_reg_r(14); -- value(14)
+                        end if;
+                        if s_axi_wstrb_reg_r(1) = '1' then
+                            s_reg_test2_value_r(15) <= s_axi_wdata_reg_r(15); -- value(15)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(16) <= s_axi_wdata_reg_r(16); -- value(16)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(17) <= s_axi_wdata_reg_r(17); -- value(17)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(18) <= s_axi_wdata_reg_r(18); -- value(18)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(19) <= s_axi_wdata_reg_r(19); -- value(19)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(20) <= s_axi_wdata_reg_r(20); -- value(20)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(21) <= s_axi_wdata_reg_r(21); -- value(21)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(22) <= s_axi_wdata_reg_r(22); -- value(22)
+                        end if;
+                        if s_axi_wstrb_reg_r(2) = '1' then
+                            s_reg_test2_value_r(23) <= s_axi_wdata_reg_r(23); -- value(23)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(24) <= s_axi_wdata_reg_r(24); -- value(24)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(25) <= s_axi_wdata_reg_r(25); -- value(25)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(26) <= s_axi_wdata_reg_r(26); -- value(26)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(27) <= s_axi_wdata_reg_r(27); -- value(27)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(28) <= s_axi_wdata_reg_r(28); -- value(28)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(29) <= s_axi_wdata_reg_r(29); -- value(29)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(30) <= s_axi_wdata_reg_r(30); -- value(30)
+                        end if;
+                        if s_axi_wstrb_reg_r(3) = '1' then
+                            s_reg_test2_value_r(31) <= s_axi_wdata_reg_r(31); -- value(31)
+                        end if;
+                    end if;
+                    -- register 'test3[]' at address offset 0x8
+                    for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
+                        if s_axi_awaddr_reg_r(AXI_ADDR_WIDTH-1 downto 2) = resize(unsigned(BASEADDR(AXI_ADDR_WIDTH-1 downto 2)) + TEST3_OFFSET(AXI_ADDR_WIDTH-1 downto 2) + i * 1, AXI_ADDR_WIDTH-2) then
+                            v_addr_hit := true;
+                            s_test3_strobe_r(i) <= '1';
+                            -- field 'value':
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(0) <= s_axi_wdata_reg_r(0); -- value(0)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(1) <= s_axi_wdata_reg_r(1); -- value(1)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(2) <= s_axi_wdata_reg_r(2); -- value(2)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(3) <= s_axi_wdata_reg_r(3); -- value(3)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(4) <= s_axi_wdata_reg_r(4); -- value(4)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(5) <= s_axi_wdata_reg_r(5); -- value(5)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(6) <= s_axi_wdata_reg_r(6); -- value(6)
+                            end if;
+                            if s_axi_wstrb_reg_r(0) = '1' then
+                                s_reg_test3_value_r(i)(7) <= s_axi_wdata_reg_r(7); -- value(7)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(8) <= s_axi_wdata_reg_r(8); -- value(8)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(9) <= s_axi_wdata_reg_r(9); -- value(9)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(10) <= s_axi_wdata_reg_r(10); -- value(10)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(11) <= s_axi_wdata_reg_r(11); -- value(11)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(12) <= s_axi_wdata_reg_r(12); -- value(12)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(13) <= s_axi_wdata_reg_r(13); -- value(13)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(14) <= s_axi_wdata_reg_r(14); -- value(14)
+                            end if;
+                            if s_axi_wstrb_reg_r(1) = '1' then
+                                s_reg_test3_value_r(i)(15) <= s_axi_wdata_reg_r(15); -- value(15)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(16) <= s_axi_wdata_reg_r(16); -- value(16)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(17) <= s_axi_wdata_reg_r(17); -- value(17)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(18) <= s_axi_wdata_reg_r(18); -- value(18)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(19) <= s_axi_wdata_reg_r(19); -- value(19)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(20) <= s_axi_wdata_reg_r(20); -- value(20)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(21) <= s_axi_wdata_reg_r(21); -- value(21)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(22) <= s_axi_wdata_reg_r(22); -- value(22)
+                            end if;
+                            if s_axi_wstrb_reg_r(2) = '1' then
+                                s_reg_test3_value_r(i)(23) <= s_axi_wdata_reg_r(23); -- value(23)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(24) <= s_axi_wdata_reg_r(24); -- value(24)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(25) <= s_axi_wdata_reg_r(25); -- value(25)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(26) <= s_axi_wdata_reg_r(26); -- value(26)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(27) <= s_axi_wdata_reg_r(27); -- value(27)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(28) <= s_axi_wdata_reg_r(28); -- value(28)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(29) <= s_axi_wdata_reg_r(29); -- value(29)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(30) <= s_axi_wdata_reg_r(30); -- value(30)
+                            end if;
+                            if s_axi_wstrb_reg_r(3) = '1' then
+                                s_reg_test3_value_r(i)(31) <= s_axi_wdata_reg_r(31); -- value(31)
+                            end if;
+                        end if;
+                    end loop;
                     --
                     if not v_addr_hit then
                         s_axi_bresp_r <= AXI_DECERR;
@@ -284,5 +627,11 @@ begin
     s_axi_rresp   <= s_axi_rresp_r;
     s_axi_rdata   <= s_axi_rdata_r;
 
+    regs2user.test1_strobe <= s_test1_strobe_r;
+    regs2user.test1_value <= s_reg_test1_value_r;
+    regs2user.test2_strobe <= s_test2_strobe_r;
+    regs2user.test2_value <= s_reg_test2_value_r;
+    regs2user.test3_strobe <= s_test3_strobe_r;
+    regs2user.test3_value <= s_reg_test3_value_r;
 
 end architecture RTL;
