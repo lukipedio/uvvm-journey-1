@@ -22,10 +22,11 @@ add wave -noupdate /axi4lite_tester_regs_tb/uut/s_axi_bresp
 add wave -noupdate /axi4lite_tester_regs_tb/uut/s_axi_bvalid
 add wave -noupdate /axi4lite_tester_regs_tb/uut/s_axi_bready
 add wave -noupdate /axi4lite_tester_regs_tb/uut/user2regs
-add wave -noupdate /axi4lite_tester_regs_tb/uut/regs2user
+add wave -noupdate -expand -subitemconfig {/axi4lite_tester_regs_tb/uut/regs2user.test3_value -expand} /axi4lite_tester_regs_tb/uut/regs2user
+add wave -noupdate -expand -subitemconfig {/axi4lite_tester_regs_tb/axilite_if.write_address_channel -expand} /axi4lite_tester_regs_tb/axilite_if
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {0 ns} 0}
-quietly wave cursor active 0
+WaveRestoreCursors {{Cursor 1} {1207 ns} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 349
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -40,4 +41,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {0 ns} {877 ns}
+WaveRestoreZoom {0 ns} {215 ns}
