@@ -225,47 +225,47 @@ begin
 
     -- Test the memory interfaces
     -- ==========================
-    print("Testing the memory interfaces");
-    v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST1_OFFSET;
-    v_mem_reg := X"AAAA5555";
-    bus_write(v_addr, v_mem_reg, v_bus_error);
-    if v_bus_error then
-      v_num_errors := v_num_errors + 1;
-    end if;
+    -- print("Testing the memory interfaces");
+    -- v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST1_OFFSET;
+    -- v_mem_reg := X"AAAA5555";
+    -- bus_write(v_addr, v_mem_reg, v_bus_error);
+    -- if v_bus_error then
+    --   v_num_errors := v_num_errors + 1;
+    -- end if;
 
-    bus_read(v_addr, v_mem_reg, v_bus_error);
-    if v_bus_error or v_mem_reg /= X"AAAA5555" then
-      v_num_errors := v_num_errors + 1;
-    end if;
+    -- bus_read(v_addr, v_mem_reg, v_bus_error);
+    -- if v_bus_error or v_mem_reg /= X"AAAA5555" then
+    --   v_num_errors := v_num_errors + 1;
+    -- end if;
 
-    v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST2_OFFSET;
-    v_mem_reg := X"5555AAAA";
-    bus_write(v_addr, v_mem_reg, v_bus_error);
-    if v_bus_error then
-      v_num_errors := v_num_errors + 1;
-    end if;
+    -- v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST2_OFFSET;
+    -- v_mem_reg := X"5555AAAA";
+    -- bus_write(v_addr, v_mem_reg, v_bus_error);
+    -- if v_bus_error then
+    --   v_num_errors := v_num_errors + 1;
+    -- end if;
 
-    bus_read(v_addr, v_mem_reg, v_bus_error);
-    if v_bus_error or v_mem_reg /= X"5555AAAA" then
-      v_num_errors := v_num_errors + 1;
-    end if;
+    -- bus_read(v_addr, v_mem_reg, v_bus_error);
+    -- if v_bus_error or v_mem_reg /= X"5555AAAA" then
+    --   v_num_errors := v_num_errors + 1;
+    -- end if;
 
     print("Testing array interfaces");    
-    for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
-      -- Write a data word to the memory
-      -- =================================
-      v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4;
-      v_mem_reg := std_logic_vector(to_unsigned(i, v_mem_reg'length));
-      bus_write(v_addr, v_mem_reg, v_bus_error);
-      if v_bus_error then
-        v_num_errors := v_num_errors + 1;
-      end if;
-    end loop;
+    -- for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
+    --   -- Write a data word to the memory
+    --   -- =================================
+    --   v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4;
+    --   v_mem_reg := std_logic_vector(to_unsigned(i, v_mem_reg'length));
+    --   bus_write(v_addr, v_mem_reg, v_bus_error);
+    --   if v_bus_error then
+    --     v_num_errors := v_num_errors + 1;
+    --   end if;
+    -- end loop;
 
-    -- Read the memory
-    for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
-      bus_read(AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4, v_mem_reg, v_bus_error);
-    end loop;
+    -- -- Read the memory
+    -- for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
+    --   bus_read(AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4, v_mem_reg, v_bus_error);
+    -- end loop;
 
     -- Test the reset values of all bus-writable register fields
     -- =========================================================
