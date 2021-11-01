@@ -1,3 +1,8 @@
 ﻿transcript
 *.wlf
 work
+*.bak
+*.mti
+*.mpf
+_Log.txt
+_Alert.txt
