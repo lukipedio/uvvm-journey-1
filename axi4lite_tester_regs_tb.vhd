@@ -121,7 +121,7 @@ architecture test of axi4lite_tester_regs_tb is
     id_for_bfm_poll => ID_BFM_POLL
   );
 
-  signal axilite_if : ST_AXILite_32 := init_axilite_if_signals(AXI_ADDR_WIDTH, 32);
+  signal axilite_if : ST_AXILite_32;
   signal alert_level : t_alert_level := error;
 
 begin
@@ -154,81 +154,6 @@ begin
       waitclk(axi_aclk, 10);
     end procedure;
 
-    -- Write a data word to the AXI4-Lite interface
-    procedure bus_write(addr : in unsigned; value : in std_logic_vector; err : out boolean) is
-      variable awready_received : boolean;
-      variable wready_received : boolean;
-    begin
-      -- Phase #1: write address & write data
-      wait until rising_edge(axi_aclk);
-      axi_awaddr <= std_logic_vector(addr);
-      axi_awprot <= (others => '0'); -- don't care
-      axi_awvalid <= '1';
-      axi_wdata <= value;
-      axi_wstrb <= (others => '1');
-      axi_wvalid <= '1';
-      awready_received := false;
-      wready_received := false;
-      loop
-        wait until rising_edge(axi_aclk);
-        if axi_awready = '1' then
-          awready_received := true;
-          axi_awaddr <= (others => 'X');
-          axi_awprot <= (others => 'X');
-          axi_awvalid <= '0';
-        end if;
-        if axi_wready = '1' then
-          wready_received := true;
-          axi_wdata <= (others => 'X');
-          axi_wstrb <= (others => '0');
-          axi_wvalid <= '0';
-        end if;
-        exit when awready_received and wready_received;
-      end loop;
-      -- Phase #2: write response
-      wait until rising_edge(axi_aclk);
-      axi_bready <= '1';
-      loop
-        wait until rising_edge(axi_aclk);
-        exit when axi_bvalid = '1';
-      end loop;
-      if axi_bresp = AXI_OKAY then
-        err := false;
-      else
-        err := true;
-      end if;
-      axi_bready <= '0';
-    end procedure;
-
-    -- Read a data word from the AXI4-Lite interface
-    procedure bus_read(addr : in unsigned; value : out std_logic_vector; err : out boolean) is
-    begin
-      -- Phase #1: read address
-      axi_araddr <= std_logic_vector(addr);
-      axi_arprot <= (others => '0'); -- don't care
-      axi_arvalid <= '1';
-      loop
-        wait until rising_edge(axi_aclk);
-        exit when axi_arready = '1';
-      end loop;
-      axi_araddr <= (others => 'X');
-      axi_arprot <= (others => 'X');
-      axi_arvalid <= '0';
-      -- Phase #2: read data
-      wait until rising_edge(axi_aclk);
-      axi_rready <= '1';
-      loop
-        wait until rising_edge(axi_aclk);
-        exit when axi_rvalid = '1';
-      end loop;
-      axi_rready <= '0';
-      value := axi_rdata;
-      if axi_rresp = AXI_OKAY then
-        err := false;
-      else
-        err := true;
-      end if;
-    end procedure;
 
     procedure axilite_write(
       constant addr_value : in unsigned;
@@ -287,15 +212,7 @@ begin
     -- Initialize the AXI bus
     -- ======================
     print("Initializing the AXI bus");
-    axi_awaddr <= (others => 'X');
-    axi_awvalid <= '0';
-    axi_wdata <= (others => 'X');
-    axi_wstrb <= (others => 'X');
-    axi_wvalid <= '0';
-    axi_araddr <= (others => 'X');
-    axi_arvalid <= '0';
-    axi_rready <= '0';
-    axi_bready <= '0';
+    axilite_if <= init_axilite_if_signals(AXI_ADDR_WIDTH, 32);
 
     -- Initialize DUT user input ports
     -- ===============================
