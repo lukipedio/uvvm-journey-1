@@ -136,6 +136,14 @@ begin
   --
   test : process is
 
+    procedure print(text: string) is
+      variable msg_line: line;
+      begin
+        write(msg_line, text);
+        writeline(output, msg_line);
+    end print;
+ 
+
     -- Reset the AXI interface
     procedure axi_reset is
     begin
@@ -300,7 +308,7 @@ begin
 
     -- Test the memory interfaces
     -- ==========================
-
+    print("Testing the memory interfaces");
     v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST1_OFFSET;
     v_mem_reg := X"AAAA5555";
     bus_write(v_addr, v_mem_reg, v_bus_error);
@@ -325,6 +333,7 @@ begin
       v_num_errors := v_num_errors + 1;
     end if;
 
+    print("Testing array interfaces");    
     for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
       -- Write a data word to the memory
       -- =================================
