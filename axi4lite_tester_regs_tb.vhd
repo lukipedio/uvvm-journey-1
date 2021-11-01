@@ -98,8 +98,8 @@ architecture test of axi4lite_tester_regs_tb is
   rdata(AXI_ADDR_WIDTH - 1 downto 0))
   );
 
-  constant C_AXILITE_BFM_CONFIG : t_axilite_bfm_config := (
-    max_wait_cycles => 5,
+  constant C_AXILITE_BFM_CONFIG_LOCAL : t_axilite_bfm_config := (
+    max_wait_cycles => 100,
     max_wait_cycles_severity => TB_WARNING,
     clock_period => clk_period,
     setup_time => clk_period/4,
@@ -130,6 +130,30 @@ begin
   -- Clock generation
   --
   axi_aclk <= not axi_aclk after clk_period;
+
+  -- AXI4 Lite Inputs to DUT
+  axi_awaddr <= axilite_if.write_address_channel.awaddr;
+  axi_awvalid <= axilite_if.write_address_channel.awvalid;
+  axi_awprot <= axilite_if.write_address_channel.awprot;
+  axi_wdata <= axilite_if.write_data_channel.wdata;
+  axi_wstrb <= axilite_if.write_data_channel.wstrb;
+  axi_wvalid <= axilite_if.write_data_channel.wvalid;
+  axi_araddr <=  axilite_if.read_address_channel.araddr;
+  axi_arvalid <= axilite_if.read_address_channel.arvalid;
+  axi_arprot <= axilite_if.read_address_channel.arprot;
+  axi_rready <= axilite_if.read_data_channel.rready;
+  axi_bready <= axilite_if.write_response_channel.bready; 
+  
+  -- AXI4 Lite Outputs from DUT
+  axilite_if.write_address_channel.awready <= axi_awready;
+  axilite_if.write_data_channel.wready <= axi_wready;
+  axilite_if.read_address_channel.arready <= axi_arready;
+  axilite_if.read_data_channel.rdata <= axi_rdata;
+  axilite_if.read_data_channel.rvalid <= axi_rvalid;
+  axilite_if.read_data_channel.rresp <= axi_rresp;
+  axilite_if.write_response_channel.bvalid <= axi_bvalid;
+  axilite_if.write_response_channel.bresp <= axi_bresp;
+  
 
   ----------------------------------------------------------------------------
   -- Test process
@@ -167,7 +191,7 @@ begin
       axilite_if, -- Signal must be visible in local process scope
       bitvis_vip_axilite.axilite_bfm_pkg.C_SCOPE, -- Just use the default
       shared_msg_id_panel, -- Use global, shared msg_id_panel
-      C_AXILITE_BFM_CONFIG); -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
+      C_AXILITE_BFM_CONFIG_DEFAULT); -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
     end;
 
     procedure axilite_read(
@@ -182,7 +206,7 @@ begin
       axilite_if, -- Signal must be visible in local process scope
       bitvis_vip_axilite.axilite_bfm_pkg.C_SCOPE, -- Just use the default
       shared_msg_id_panel, -- Use global, shared msg_id_panel
-      C_AXILITE_BFM_CONFIG, -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
+      C_AXILITE_BFM_CONFIG_DEFAULT, -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
       "");
     end;
 
@@ -199,7 +223,7 @@ begin
       alert_level,
       bitvis_vip_axilite.axilite_bfm_pkg.C_SCOPE, -- Just use the default
       shared_msg_id_panel, -- Use global, shared msg_id_panel
-      C_AXILITE_BFM_CONFIG); -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
+      C_AXILITE_BFM_CONFIG_DEFAULT); -- Use locally defined configuration or C_AXILITE_BFM_CONFIG_DEFAULT
     end;
 
     variable v_bus_error : boolean;
@@ -213,7 +237,7 @@ begin
     -- ======================
     print("Initializing the AXI bus");
     axilite_if <= init_axilite_if_signals(AXI_ADDR_WIDTH, 32);
-
+    
     -- Initialize DUT user input ports
     -- ===============================
     print("Initializing DUT input ports");
@@ -225,60 +249,28 @@ begin
 
     -- Test the memory interfaces
     -- ==========================
-    -- print("Testing the memory interfaces");
-    -- v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST1_OFFSET;
-    -- v_mem_reg := X"AAAA5555";
-    -- bus_write(v_addr, v_mem_reg, v_bus_error);
-    -- if v_bus_error then
-    --   v_num_errors := v_num_errors + 1;
-    -- end if;
+    v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST1_OFFSET;
+    v_mem_reg := X"AAAA5555";
+    axilite_write(v_addr, v_mem_reg, "Write to memory");
+    axilite_check(v_addr, v_mem_reg, "Check memory");
 
-    -- bus_read(v_addr, v_mem_reg, v_bus_error);
-    -- if v_bus_error or v_mem_reg /= X"AAAA5555" then
-    --   v_num_errors := v_num_errors + 1;
-    -- end if;
+    v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST2_OFFSET;
+    v_mem_reg := X"5555AAAA";
+    axilite_write(v_addr, v_mem_reg, "Write to memory");
+    axilite_check(v_addr, v_mem_reg, "Check memory");
 
-    -- v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+TEST2_OFFSET;
-    -- v_mem_reg := X"5555AAAA";
-    -- bus_write(v_addr, v_mem_reg, v_bus_error);
-    -- if v_bus_error then
-    --   v_num_errors := v_num_errors + 1;
-    -- end if;
-
-    -- bus_read(v_addr, v_mem_reg, v_bus_error);
-    -- if v_bus_error or v_mem_reg /= X"5555AAAA" then
-    --   v_num_errors := v_num_errors + 1;
-    -- end if;
-
-    print("Testing array interfaces");    
-    -- for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
-    --   -- Write a data word to the memory
-    --   -- =================================
-    --   v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4;
-    --   v_mem_reg := std_logic_vector(to_unsigned(i, v_mem_reg'length));
-    --   bus_write(v_addr, v_mem_reg, v_bus_error);
-    --   if v_bus_error then
-    --     v_num_errors := v_num_errors + 1;
-    --   end if;
-    -- end loop;
-
-    -- -- Read the memory
-    -- for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
-    --   bus_read(AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4, v_mem_reg, v_bus_error);
-    -- end loop;
+    for i in 0 to TEST3_ARRAY_LENGTH - 1 loop
+      v_addr := AXI4LITE_TESTER_DEFAULT_BASEADDR+8+i*4;
+      v_mem_reg := std_logic_vector(to_unsigned(i, v_mem_reg'length));
+      axilite_write(v_addr, v_mem_reg, "Write to memory");
+      axilite_check(v_addr, v_mem_reg, "Check memory");
+    end loop;
 
     -- Test the reset values of all bus-writable register fields
     -- =========================================================
 
     -- Test the correct operation of every register field
     -- ==================================================
-
-    -- Report test results
-    if v_num_errors = 0 then
-      print("*** Simulation PASS *** ");
-    else
-      print("*** Simulation FAIL (" & integer'image(v_num_errors) & " errors) ***");
-    end if;
 
     std.env.stop;
 
